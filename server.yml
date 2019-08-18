@@ -17,11 +17,11 @@ Parameters:
         Type: String
         Default: 10.0.70.0/24
     PrivateSubnet1CIDR:
-        Description: Please enter the IP range (CIDR notation) for this
+        Description: Please enter the IP range (CIDR notation)
         Type: String
         Default: 10.0.3.0/24
     PrivateSubnet2CIDR:
-          Description: Please enter the IP range (CIDR notation) for this
+          Description: Please enter the IP range (CIDR notation)
           Type: String
           Default: 10.0.4.0/24
 
@@ -139,6 +139,7 @@ Resources:
             RouteTableId: !Ref 'PublicRouteTable'
             DestinationCidrBlock: '0.0.0.0/0'
             GatewayId: !Ref 'InternetGateway'
+            
           
     PublicSubnetOneRouteTableAssociation:
         Type: AWS::EC2::SubnetRouteTableAssociation
@@ -166,6 +167,7 @@ Resources:
             RouteTableId: !Ref 'PrivateRouteTable1'
             NatGatewayId: !Ref 'NatGateway1'
             DestinationCidrBlock: '0.0.0.0/0'
+            
 
     PrivateSubnet1RouteTableAssociation:
         Type: AWS::EC2::SubnetRouteTableAssociation
@@ -179,7 +181,7 @@ Resources:
             VpcId: !Ref 'VPC'
             Tags:
                 -   Key: Name
-                    Value: !Sub ${EnvironmentName}-private-route-table-AZ2
+                    Value: !Sub ${EnvironmentName}-Private-Route-Table-AZ2
 
     PrivateRoute2:
         Type: AWS::EC2::Route
@@ -187,6 +189,7 @@ Resources:
             RouteTableId: !Ref 'PrivateRouteTable2'
             NatGatewayId: !Ref 'NatGateway2'
             DestinationCidrBlock: '0.0.0.0/0'
+            
       
     PrivateSubnet2RouteTableAssociation:
         Type: AWS::EC2::SubnetRouteTableAssociation
@@ -203,7 +206,6 @@ Resources:
                 - Ref: PublicSub2
             SecurityGroups:
                 - Ref: WebSecurityGroup         
-            
             Tags:
                 - Key: Name
                   Value: !Sub ${EnvironmentName}-lb
@@ -231,7 +233,7 @@ Resources:
             HealthCheckProtocol: HTTP
             HealthCheckTimeoutSeconds: 30
             HealthyThresholdCount: 2
-            Port: 80
+            Port: 8080
             Protocol: HTTP
             UnhealthyThresholdCount: 5
             VpcId: !Ref 'VPC'
@@ -279,16 +281,22 @@ Resources:
         Type: AWS::EC2::SecurityGroup
         Properties:
             VpcId: !Ref 'VPC'
-            GroupDescription: Web Server security group
+            GroupDescription: Allow http to our host and SSH from local only
             SecurityGroupIngress:
                 - SourceSecurityGroupId: !Ref BastionSecurityGroup
                   IpProtocol: tcp
                   FromPort: 22
                   ToPort: 22
-                - CidrIp: 0.0.0.0/0
-                  IpProtocol: tcp
-                  FromPort: 80
-                  ToPort: 80
+                  
+                - IpProtocol: tcp
+                  FromPort: 8080
+                  ToPort: 8080
+                  CidrIp: 0.0.0.0/0
+            SecurityGroupEgress:
+                - IpProtocol: tcp
+                  FromPort: 0
+                  ToPort: 65535
+                  CidrIp: 0.0.0.0/0
             Tags:
                 -   Key: Name
                     Value: !Sub ${EnvironmentName}-web-server-sg
@@ -385,50 +393,80 @@ Resources:
 
 Outputs:
     VPC:
-        Description: "The ID of the VPC"
+        Description: "A reference to created VPC"
         Value: !Ref VPC
         Export:
-            Name: !Sub "${AWS::StackName}-VPCID"
+            Name: !Sub "${EnvironmentName}-VPCID"
     PrivateSub1:
-        Description: "Private Subnet-1"
+        Description: "A reference to private subnet in AZ-1"
         Value: !Ref PrivateSubnet1CIDR
         Export:
-            Name: !Sub "${AWS::StackName}-PRIVATESUBNET1"
+            Name: !Sub "${EnvironmentName}-PRIVATESUBNET1"
     PrivateSub2:
-        Description: "Private Subnet-2"
+        Description: "A reference to private subnet in AZ-2"
         Value: !Ref PrivateSubnet2CIDR
         Export:
-            Name: !Sub "${AWS::StackName}-PRIVATESUBNET2"
+            Name: !Sub "${EnvironmentName}-PRIVATESUBNET2"
     PublicSub1:
-        Description: "Public Subnet-1"
+        Description: "A reference to public subnet in AZ-1"
         Value: !Ref PublicSubnet1CIDR
         Export:
-            Name: !Sub "${AWS::StackName}-PUBLICSUBNET1"
+            Name: !Sub "${EnvironmentName}-PUBLICSUBNET1"
     PublicSub2:
-        Description: "Public Subnet-2"
+        Description: "A reference to public subnet in AZ-2"
         Value: !Ref PublicSubnet2CIDR
         Export:
-            Name: !Sub "${AWS::StackName}-PUBLICSUBNET2"
+            Name: !Sub "${EnvironmentName}-PUBLICSUBNET2"
+    
+    PublicSubnets:
+        Description: A list of public subnets
+        Value: !Join [",", [!Ref PublicSub1, !Ref PublicSub2]]
+        Export:
+            Name: !Sub ${EnvironmentName}-PUB-NETS
+    
+    PrivateSubnets:
+        Description: A list of private subnets
+        Value: !Join [",", [!Ref PrivateSub1, !Ref PrivateSub2]]
+        Export:
+            Name: !Sub ${EnvironmentName}-PRIV-NETS
+
+    VPCPublicRouteTable:
+        Description: Public Routing
+        Value: !Ref PublicRouteTable
+        Export:
+            Name: !Sub ${EnvironmentName}-PUB-RT
+
+    VPCPrivateRouteTable1:
+        Description: Private Routing AZ1
+        Value: !Ref PrivateRouteTable1
+        Export:
+            Name: !Sub ${EnvironmentName}-PRI1-RT
+
+    VPCPrivateRouteTable2:
+        Description: Private Routing AZ2
+        Value: !Ref PrivateRouteTable2
+        Export:
+            Name: !Sub ${EnvironmentName}-PRI2-RT
     IGW:
         Description: Stack IGW ID
         Value: !Ref InternetGateway
         Export:
-            Name: !Sub "${AWS::StackName}-IGW"
+            Name: !Sub "${EnvironmentName}-IGW"
     BastionIP:
         Description: "Bastion Public IP"
         Value: !GetAtt BastionNode.PublicIp
         Export:
-            Name: !Sub "${AWS::StackName}-bastion-public-ip"
+            Name: !Sub "${EnvironmentName}-Bastion-Public-IP"
     BastionDNS:
         Description: Bastion DNS
         Value: !GetAtt BastionNode.PublicDnsName
         Export:
-            Name: !Sub "${AWS::StackName}-bastion-public-dns"
+            Name: !Sub "${EnvironmentName}-bastion-Public-DNS"
     LoadBalancerDNS:
         Description: LoadBalancer DNS
         Value: !Join [ "", [ "http://", !GetAtt LoadBalancer.DNSName ] ]
         Export:
-            Name: !Sub "${AWS::StackName}-lb-dns"
+            Name: !Sub "${EnvironmentName}-LB-DNSName"
 
 
     
