@@ -1,3 +1,5 @@
+Description: 'Reshma Nair | Deploy a high availabilty web-app using CloudFormation'
+
 Parameters:
     EnvironmentName:
         Description: An environment name that will be prefixed to resources
