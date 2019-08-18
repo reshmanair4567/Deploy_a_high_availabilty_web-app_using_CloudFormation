@@ -140,7 +140,6 @@ Resources:
               apt-get update -y
               apt-get install unzip awscli -y
               apt-get install apache2 -y
-              
               systemctl start apache2
               cd /var/www/html
               aws s3 cp s3://udacity-clouddevops/code.zip .

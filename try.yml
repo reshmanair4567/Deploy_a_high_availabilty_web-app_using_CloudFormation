@@ -279,7 +279,7 @@ Resources:
         VpcId: !Ref 'VPC'
         GroupDescription: Web Server security group
         SecurityGroupIngress:
-          - SourceSecurityGroupId: !Ref BationSecurityGroup
+          - SourceSecurityGroupId: !Ref BastionSecurityGroup
             IpProtocol: tcp
             FromPort: 22
             ToPort: 22
@@ -290,9 +290,6 @@ Resources:
         Tags:
           -   Key: Name
               Value: !Sub ${EnvironmentName}-web-server-sg
-
-    
-
 
     ##### Web Servers Auto Scaling + Launch Config
     WebServerAutoScalingGroup:
