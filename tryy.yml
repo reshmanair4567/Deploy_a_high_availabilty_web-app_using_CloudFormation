@@ -327,29 +327,28 @@ Resources:
         Type: AWS::AutoScaling::LaunchConfiguration
         Properties:
             UserData:
-            Fn::Base64: !Sub |
-                #!/bin/bash
-                apt-get update -y
-                apt-get install unzip awscli -y
-                apt-get install apache2 -y
-                systemctl start apache2
-                cd /var/www/html
-                aws s3 cp s3://udacity-clouddevops/code.zip .
-                unzip -o code.zip
-                cp code/index.html .
-                chown -R www-data:www-data .
+                Fn::Base64: !Sub |
+                    #!/bin/bash
+                    apt-get update -y
+                    apt-get install unzip awscli -y
+                    apt-get install apache2 -y
+                    systemctl start apache2
+                    cd /var/www/html
+                    aws s3 cp s3://udacity-clouddevops/code.zip .
+                    unzip -o code.zip
+                    cp code/index.html .
+                    chown -R www-data:www-data .
             ImageId: ami-06f2f779464715dc5
             IamInstanceProfile:
                 Ref: S3BucketInstanceProfile
             InstanceType: t2.micro
             BlockDeviceMappings:
                 - DeviceName: "/dev/sda1"
-                Ebs:
-                    VolumeSize: 24
-                    VolumeType: gp2
+                  Ebs:
+                      VolumeSize: 24
+                      VolumeType: gp2
             SecurityGroups:
                 - Ref: WebSecurityGroup
-
 
 ## s3 bucket policy ##    
     S3BucketsPolicy:
@@ -360,9 +359,9 @@ Resources:
                 Version: '2012-10-17'
                 Statement:
                     - Effect: Allow
-                    Action:
-                        - s3:List*
-                        Resource: "*"
+                      Action:
+                          - s3:List*
+                      Resource: "*"
             Roles:
                 - Ref: S3BucketsRole
 
@@ -372,69 +371,70 @@ Resources:
             ManagedPolicyArns:
                 - "arn:aws:iam::aws:policy/AmazonS3FullAccess"
             AssumeRolePolicyDocument:
-                Version: '2012-10-17'
+                Version: "2012-10-17"
                 Statement:
-                    - Effect: Allow
-                        Principal:
+                    Effect: "Allow"
+                    Principal:
                         Service:
-                        - ec2.amazonaws.com
-                        Action:
-                        - sts:AssumeRole
-            Path: "/"
+                            - ec2.amazonaws.com
+                    Action: 
+                        - "sts:AssumeRole"
+        
 
     S3BucketInstanceProfile:
         Type: AWS::IAM::InstanceProfile
         Properties:
+            
             Roles:
                 - Ref: S3BucketsRole
 
 
 Outputs:
     VPC:
-      Description: AWS VPC ID
-      Value: !Ref VPC
-      Export:
-        Name: !Sub "${AWS::StackName}-VPCID"
+        Description: "The ID of the VPC"
+        Value: !Ref VPC
+        Export:
+            Name: !Sub "${AWS::StackName}-VPCID"
     PrivateSub1:
-      Description: Private Subnet 1
-      Value: !Ref PrivateSubnet1CIDR
-      Export:
-        Name: !Sub "${AWS::StackName}-PRIVSUBNET1"
+        Description: "Private Subnet-1"
+        Value: !Ref PrivateSubnet1CIDR
+        Export:
+            Name: !Sub "${AWS::StackName}-PRIVATESUBNET1"
     PrivateSub2:
-      Description: Private Subnet 2
-      Value: !Ref PrivateSubnet2CIDR
-      Export:
-        Name: !Sub "${AWS::StackName}-PRIVSUBNET2"
+        Description: "Private Subnet-2"
+        Value: !Ref PrivateSubnet2CIDR
+        Export:
+            Name: !Sub "${AWS::StackName}-PRIVATESUBNET2"
     PublicSub1:
-      Description: Public Subnet 1
-      Value: !Ref PublicSubnet1CIDR
-      Export:
-        Name: !Sub "${AWS::StackName}-PUBSUBNET1"
+        Description: "Public Subnet-1"
+        Value: !Ref PublicSubnet1CIDR
+        Export:
+            Name: !Sub "${AWS::StackName}-PUBLICSUBNET1"
     PublicSub2:
-      Description: Public Subnet 2
-      Value: !Ref PublicSubnet2CIDR
-      Export:
-        Name: !Sub "${AWS::StackName}-PUBSUBNET2"
-    StackIGW:
-      Description: Stack IGW ID
-      Value: !Ref InternetGateway
-      Export:
-        Name: !Sub "${AWS::StackName}-IGW"
+        Description: "Public Subnet-2"
+        Value: !Ref PublicSubnet2CIDR
+        Export:
+            Name: !Sub "${AWS::StackName}-PUBLICSUBNET2"
+    IGW:
+        Description: Stack IGW ID
+        Value: !Ref InternetGateway
+        Export:
+            Name: !Sub "${AWS::StackName}-IGW"
     BastionIP:
-      Description: Bastion Public IP
-      Value: !GetAtt BastionNode.PublicIp
-      Export:
-        Name: !Sub "${AWS::StackName}-bastion-public-ip"
+        Description: "Bastion Public IP"
+        Value: !GetAtt BastionNode.PublicIp
+        Export:
+            Name: !Sub "${AWS::StackName}-bastion-public-ip"
     BastionDNS:
-      Description: Bastion DNS
-      Value: !GetAtt BastionNode.PublicDnsName
-      Export:
-        Name: !Sub "${AWS::StackName}-bastion-public-dns"
+        Description: Bastion DNS
+        Value: !GetAtt BastionNode.PublicDnsName
+        Export:
+            Name: !Sub "${AWS::StackName}-bastion-public-dns"
     LoadBalancerDNS:
-      Description: LoadBalancer DNS
-      Value: !Join [ "", [ "http://", !GetAtt LoadBalancer.DNSName ] ]
-      Export:
-        Name: !Sub "${AWS::StackName}-lb-dns"
+        Description: LoadBalancer DNS
+        Value: !Join [ "", [ "http://", !GetAtt LoadBalancer.DNSName ] ]
+        Export:
+            Name: !Sub "${AWS::StackName}-lb-dns"
 
 
     
