@@ -334,12 +334,10 @@ Resources:
                     apt-get update -y
                     apt-get install unzip awscli -y
                     apt-get install apache2 -y
-                    systemctl start apache2
+                    systemctl start apache2.service
                     cd /var/www/html
-                    aws s3 cp s3://udacity-clouddevops/code.zip .
-                    unzip -o code.zip
-                    cp code/index.html .
-                    chown -R www-data:www-data .
+                    aws s3 cp s3://deploy-iac-udagram/Udagram.zip .
+                    unzip -o Udagram.zip
             ImageId: ami-06f2f779464715dc5
             IamInstanceProfile:
                 Ref: S3BucketInstanceProfile
