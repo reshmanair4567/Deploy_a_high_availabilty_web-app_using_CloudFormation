@@ -1,6 +1,6 @@
-Description: 'Reshma Nair | Deploy a high availabilty web-app using CloudFormation'
-
 Parameters:
+
+
     EnvironmentName:
         Description: An environment name that will be prefixed to resources
         Type: String
@@ -205,13 +205,8 @@ Resources:
                 - Ref: PublicSub1
                 - Ref: PublicSub2
             SecurityGroups:
-                - Ref: WebSecurityGroup
-            HealthCheck:
-                Target: HTTP:80/
-                HealthyThreshold: '3'
-                UnhealthyThreshold: '5'
-                Interval: '30'
-                Timeout: '5'
+                - Ref: WebSecurityGroup         
+            
             Tags:
                 - Key: Name
                   Value: !Sub ${EnvironmentName}-lb
@@ -249,9 +244,9 @@ Resources:
         Type: AWS::EC2::Instance
         Properties:
             BlockDeviceMappings:
-                - DeviceName: "/dev/sda1"
+                - DeviceName: "/dev/sdb1"
                 - Ebs:
-                    VolumeSize: 24
+                    VolumeSize: '64'
                     VolumeType: gp2
             Tags:
                 - Key: Name
@@ -347,7 +342,7 @@ Resources:
             BlockDeviceMappings:
                 - DeviceName: "/dev/sda1"
                   Ebs:
-                      VolumeSize: 24
+                      VolumeSize: '64'
                       VolumeType: gp2
             SecurityGroups:
                 - Ref: WebSecurityGroup
