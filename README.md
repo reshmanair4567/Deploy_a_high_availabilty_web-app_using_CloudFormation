@@ -2,18 +2,28 @@ This projects aims to deploy Infrastructure as a Code
 
 
 To create a new stack, run create. sh followed by the the stack name and template body
+
+
 aws cloudformation create-stack --stack-name infrastack --region us-west-2 --template-body file://ourinfra.yml --parameters ourinfra-params.json --capabilities CAPABILITY_IAM
 
+
 Example : ./create.sh infrastack server.yml server-params.json
+
+
 The template body is a parameter file with default values
 
 To update an exisiting stack :
 aws cloudformation update-stack --stack-name infrastack --region us-west-2 --template-body file://ourinfra.yml --parameters ourinfra-params.json --capabilities CAPABILITY_IAM
+
+
 ./update.sh infrastack server.yml server-params.json
 
 
 To delete a stack:
 aws cloudformation delete-stack --stack-name $1 --region=us-west-2
+
+
+
 ./delete.sh infrastack
 
 Resources :
