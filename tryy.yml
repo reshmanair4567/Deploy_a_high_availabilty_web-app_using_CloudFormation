@@ -107,25 +107,22 @@ Resources:
         Type: 'AWS::EC2::NatGateway'
         Properties:
             AllocationId:
-              Fn::GetAtt:
-              - NatGateway1EIP
-              - AllocationId
+                Fn::GetAtt:
+                    - NatGateway1EIP
+                    - AllocationId
             SubnetId: !Ref PublicSub1
             Tags:
-            - Key: Name
-            Value: !Sub ${EnvironmentName}-Nat-Gateway-1
+                - Key: Name
+                  Value: !Sub ${EnvironmentName}-Nat-Gateway-1
                 
     NatGateway2:
         Type: 'AWS::EC2::NatGateway'
         Properties:
-            AllocationId:
-              Fn::GetAtt:
-              - NatGateway2EIP
-              - AllocationId
+            AllocationId: !GetAtt 'NatGateway2EIP.AllocationId'
             SubnetId: !Ref PublicSub2
             Tags:
-            - Key: Name
-            Value: !Sub ${EnvironmentName}-Nat-Gateway-2
+                - Key: Name
+                  Value: !Sub ${EnvironmentName}-Nat-Gateway-2
             
     PublicRouteTable:
         Type: AWS::EC2::RouteTable
@@ -244,8 +241,8 @@ Resources:
         Type: AWS::EC2::Instance
         Properties:
             BlockDeviceMappings:
-                - DeviceName: "/dev/sdb1"
-                - Ebs:
+                - DeviceName: "/dev/sdb"
+                  Ebs:
                     VolumeSize: '64'
                     VolumeType: gp2
             Tags:
@@ -307,10 +304,10 @@ Resources:
                 - Ref: "PrivateSub1"
                 - Ref: "PrivateSub2"
             MetricsCollection: 
-                Granularity: "1Minute"
-            Metrics: 
-                - "GroupMinSize"
-                - "GroupMaxSize"
+                - Granularity: "1Minute"
+                  Metrics: 
+                    - "GroupMinSize"
+                    - "GroupMaxSize"
             LaunchConfigurationName:
                 Ref: "WebServerLaunchConfig"
             MinSize: "3"
