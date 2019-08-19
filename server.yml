@@ -4,6 +4,9 @@ Parameters:
     EnvironmentName:
         Description: An environment name that will be prefixed to resources
         Type: String
+    EnvironmentLocation:
+        Description: An environment Location that will be prefixed to resources
+        Type: String
     VpcCIDR:
         Description: Please enter the IP range (CIDR notation) for this
         Type: String
@@ -399,72 +402,72 @@ Outputs:
         Description: "A reference to private subnet in AZ-1"
         Value: !Ref PrivateSubnet1CIDR
         Export:
-            Name: !Sub "${EnvironmentName}-PRIVATESUBNET1"
+            Name: !Sub "${EnvironmentLocation}-PRIVATESUBNET1"
     PrivateSub2:
         Description: "A reference to private subnet in AZ-2"
         Value: !Ref PrivateSubnet2CIDR
         Export:
-            Name: !Sub "${EnvironmentName}-PRIVATESUBNET2"
+            Name: !Sub "${EnvironmentLocation}-PRIVATESUBNET2"
     PublicSub1:
         Description: "A reference to public subnet in AZ-1"
         Value: !Ref PublicSubnet1CIDR
         Export:
-            Name: !Sub "${EnvironmentName}-PUBLICSUBNET1"
+            Name: !Sub "${EnvironmentLocation}-PUBLICSUBNET1"
     PublicSub2:
         Description: "A reference to public subnet in AZ-2"
         Value: !Ref PublicSubnet2CIDR
         Export:
-            Name: !Sub "${EnvironmentName}-PUBLICSUBNET2"
+            Name: !Sub "${EnvironmentLocation}-PUBLICSUBNET2"
     
     PublicSubnets:
         Description: A list of public subnets
         Value: !Join [",", [!Ref PublicSub1, !Ref PublicSub2]]
         Export:
-            Name: !Sub ${EnvironmentName}-PUB-NETS
+            Name: !Sub "${EnvironmentLocation}-PUB-NETS"
     
     PrivateSubnets:
         Description: A list of private subnets
         Value: !Join [",", [!Ref PrivateSub1, !Ref PrivateSub2]]
         Export:
-            Name: !Sub ${EnvironmentName}-PRIV-NETS
+            Name: !Sub "${EnvironmentLocation}-PRIV-NETS"
 
     VPCPublicRouteTable:
         Description: Public Routing
         Value: !Ref PublicRouteTable
         Export:
-            Name: !Sub ${EnvironmentName}-PUB-RT
+            Name: !Sub "${EnvironmentLocation}-PUB-RT"
 
     VPCPrivateRouteTable1:
         Description: Private Routing AZ1
         Value: !Ref PrivateRouteTable1
         Export:
-            Name: !Sub ${EnvironmentName}-PRI1-RT
+            Name: !Sub "${EnvironmentLocation}-PRI1-RT"
 
     VPCPrivateRouteTable2:
         Description: Private Routing AZ2
         Value: !Ref PrivateRouteTable2
         Export:
-            Name: !Sub ${EnvironmentName}-PRI2-RT
+            Name: !Sub "${EnvironmentLocation}-PRI2-RT"
     IGW:
         Description: Stack IGW ID
         Value: !Ref InternetGateway
         Export:
-            Name: !Sub "${EnvironmentName}-IGW"
+            Name: !Sub "${EnvironmentLocation}-IGW"
     BastionIP:
         Description: "Bastion Public IP"
         Value: !GetAtt BastionNode.PublicIp
         Export:
-            Name: !Sub "${EnvironmentName}-Bastion-Public-IP"
+            Name: !Sub "${EnvironmentLocation}-Bastion-Public-IP"
     BastionDNS:
         Description: Bastion DNS
         Value: !GetAtt BastionNode.PublicDnsName
         Export:
-            Name: !Sub "${EnvironmentName}-bastion-Public-DNS"
+            Name: !Sub "${EnvironmentLocation}-bastion-Public-DNS"
     LoadBalancerDNS:
         Description: LoadBalancer DNS
         Value: !Join [ "", [ "http://", !GetAtt LoadBalancer.DNSName ] ]
         Export:
-            Name: !Sub "${EnvironmentName}-LB-DNSName"
+            Name: !Sub "${EnvironmentLocation}-LB-DNSName"
 
 
     

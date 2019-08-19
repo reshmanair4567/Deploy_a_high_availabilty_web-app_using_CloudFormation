@@ -1,7 +1,13 @@
 [
     {
         "ParameterKey": "EnvironmentName",
-        "ParameterValue": "Reshma"
+        "ParameterValue": "Reshma-Project"
+    },
+
+    {
+        "ParameterKey": "EnvironmentLocation",
+        "ParameterValue": "Production"
     }
+
 
 ]
