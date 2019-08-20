@@ -341,7 +341,7 @@ Resources:
     WebServerAutoScalingGroup:
         Type: AWS::AutoScaling::AutoScalingGroup
         Properties:
-            Cooldown: 300
+            Cooldown: 100
             TargetGroupARNs:
                 - !Ref WebServerTargetGroup
             VPCZoneIdentifier:
