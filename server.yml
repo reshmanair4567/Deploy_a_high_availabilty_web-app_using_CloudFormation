@@ -209,7 +209,7 @@ Resources:
                 - Ref: PublicSub1
                 - Ref: PublicSub2
             SecurityGroups:
-                - Ref: WebSecurityGroup         
+                - Ref: LBSecurityGroup         
             Tags:
                 - Key: Name
                   Value: !Sub ${EnvironmentName}-lb
@@ -224,6 +224,17 @@ Resources:
             Port: 80
             Protocol: HTTP
 
+    LoadBalancerListenerRule:
+        Type: AWS::ElasticLoadBalancingV2::ListenerRule
+        Properties: 
+            Actions: 
+                - Type: forward
+                  TargetGroupArn: !Ref WebServerTargetGroup
+            Conditions: 
+                - Field: path-pattern
+                  Values: [/]
+            ListenerArn: !Ref LoadBalancerListener
+            Priority: 1
 
     WebServerTargetGroup:
         Type: AWS::ElasticLoadBalancingV2::TargetGroup
@@ -232,10 +243,10 @@ Resources:
             Tags:
                 - Key: Name
                   Value: !Sub ${EnvironmentName}-web-server-tg
-            HealthCheckIntervalSeconds: 35
+            HealthCheckIntervalSeconds: 30
             HealthCheckPath: /
             HealthCheckProtocol: HTTP
-            HealthCheckTimeoutSeconds: 30
+            HealthCheckTimeoutSeconds: 10
             HealthyThresholdCount: 2
             Port: 8080
             Protocol: HTTP
@@ -255,7 +266,7 @@ Resources:
                 - Key: Name
                   Value: !Sub ${EnvironmentName}-bastion
             ImageId: ami-06f2f779464715dc5
-            InstanceType: t2.micro
+            InstanceType: t3.small
             SubnetId:
                 Ref: PublicSub1
             AvailabilityZone: !Select [ 0, !GetAZs '' ]
@@ -281,20 +292,41 @@ Resources:
                 -   Key: Name
                     Value: !Sub ${EnvironmentName}-bastion-sg
 
+    LBSecurityGroup:
+        Type: AWS::EC2::SecurityGroup
+        Properties:
+            GroupDescription: Allow http to our load balancer
+            VpcId: !Ref 'VPC'
+            SecurityGroupIngress:
+                - IpProtocol: tcp
+                  FromPort: 80
+                  ToPort: 80
+                  CidrIp: 0.0.0.0/0
+            SecurityGroupEgress:
+                - IpProtocol: tcp
+                  FromPort: 80
+                  ToPort: 80
+                  CidrIp: 0.0.0.0/0
+                - IpProtocol: tcp
+                  FromPort: 8080
+                  ToPort: 8080
+                  CidrIp: 0.0.0.0/0
+    
     WebSecurityGroup:
         Type: AWS::EC2::SecurityGroup
         Properties:
             VpcId: !Ref 'VPC'
             GroupDescription: Allow http to our host and SSH from local only
             SecurityGroupIngress:
-                - SourceSecurityGroupId: !Ref BastionSecurityGroup
-                  IpProtocol: tcp
+                - IpProtocol: tcp
                   FromPort: 22
                   ToPort: 22
+                  CidrIp: 0.0.0.0/0
+
                   
                 - IpProtocol: tcp
-                  FromPort: 8080
-                  ToPort: 8080
+                  FromPort: 80
+                  ToPort: 80
                   CidrIp: 0.0.0.0/0
             SecurityGroupEgress:
                 - IpProtocol: tcp
@@ -399,6 +431,7 @@ Outputs:
         Value: !Ref VPC
         Export:
             Name: !Sub "${EnvironmentName}-VPCID"
+
     PrivateSub1:
         Description: "A reference to private subnet in AZ-1"
         Value: !Ref PrivateSubnet1CIDR
