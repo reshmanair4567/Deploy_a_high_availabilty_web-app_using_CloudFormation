@@ -243,14 +243,14 @@ Resources:
             Tags:
                 - Key: Name
                   Value: !Sub ${EnvironmentName}-web-server-tg
-            HealthCheckIntervalSeconds: 30
+            HealthCheckIntervalSeconds: 10
             HealthCheckPath: /
             HealthCheckProtocol: HTTP
-            HealthCheckTimeoutSeconds: 10
+            HealthCheckTimeoutSeconds: 5
             HealthyThresholdCount: 2
-            Port: 8080
+            Port: 80
             Protocol: HTTP
-            UnhealthyThresholdCount: 5
+            UnhealthyThresholdCount: 2
             VpcId: !Ref 'VPC'
 
 ##  Bastion ##
@@ -374,6 +374,7 @@ Resources:
                     cd /var/www/html
                     aws s3 cp s3://deploy-iac-udagram/Udagram.zip .
                     unzip -o Udagram.zip
+                    
             ImageId: ami-06f2f779464715dc5
             IamInstanceProfile:
                 Ref: S3BucketInstanceProfile
