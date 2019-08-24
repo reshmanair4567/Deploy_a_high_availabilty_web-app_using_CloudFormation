@@ -372,10 +372,13 @@ Resources:
                     apt-get -y install apache2
                     systemctl start apache2
                     cd /var/www/html
+                    rm -f index.html
                     chmod 755 /var/www/html
                     wget https://deploy-iac-udagram.s3-us-west-2.amazonaws.com/Udagram.zip
-                    tar -xzvf Udagram.zip
+                    apt-get -y install unzip
+                    unzip -o Udagram.zip
                     chown -R www-data:www-data .
+                    systemctl reload apache2
             ImageId: ami-06f2f779464715dc5
             IamInstanceProfile:
                 Ref: S3BucketInstanceProfile
