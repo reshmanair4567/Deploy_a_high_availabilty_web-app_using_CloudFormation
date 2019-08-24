@@ -266,7 +266,7 @@ Resources:
                 - Key: Name
                   Value: !Sub ${EnvironmentName}-bastion
             ImageId: ami-06f2f779464715dc5
-            InstanceType: t3.small
+            InstanceType: t2.small
             SubnetId:
                 Ref: PublicSub1
             AvailabilityZone: !Select [ 0, !GetAZs '' ]
